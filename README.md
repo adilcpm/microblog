@@ -1,4 +1,4 @@
 # microblog
 My Flask Project 
 
-Now this is on v0.6
+Now this is on v1.0
