@@ -1,0 +1,67 @@
+2020-04-14 22:24:03,919 INFO: Microblog startup [in /home/adil/microblog/app/__init__.py:45]
+2020-04-14 22:31:25,375 INFO: Microblog startup [in /home/adil/microblog/app/__init__.py:47]
+2020-04-14 23:16:35,566 INFO: Microblog startup [in /home/adil/microblog/app/__init__.py:47]
+2020-04-14 23:16:47,397 ERROR: Exception on /user/adi [GET] [in /home/adil/microblog/venv/lib/python3.8/site-packages/flask/app.py:1891]
+Traceback (most recent call last):
+  File "/home/adil/microblog/venv/lib/python3.8/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/adil/microblog/venv/lib/python3.8/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/adil/microblog/venv/lib/python3.8/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/adil/microblog/venv/lib/python3.8/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/adil/microblog/venv/lib/python3.8/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/adil/microblog/venv/lib/python3.8/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/adil/microblog/venv/lib/python3.8/site-packages/flask_login/utils.py", line 272, in decorated_view
+    return func(*args, **kwargs)
+  File "/home/adil/microblog/app/routes.py", line 78, in user
+    page = request.ars.get( 'page' , 1 , type = int)
+  File "/home/adil/microblog/venv/lib/python3.8/site-packages/werkzeug/local.py", line 347, in __getattr__
+    return getattr(self._get_current_object(), name)
+AttributeError: 'Request' object has no attribute 'ars'
+2020-04-14 23:18:15,358 INFO: Microblog startup [in /home/adil/microblog/app/__init__.py:47]
+2020-04-14 23:18:19,691 ERROR: Exception on /user/adi [GET] [in /home/adil/microblog/venv/lib/python3.8/site-packages/flask/app.py:1891]
+Traceback (most recent call last):
+  File "/home/adil/microblog/venv/lib/python3.8/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/adil/microblog/venv/lib/python3.8/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/adil/microblog/venv/lib/python3.8/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/adil/microblog/venv/lib/python3.8/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/adil/microblog/venv/lib/python3.8/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/adil/microblog/venv/lib/python3.8/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/adil/microblog/venv/lib/python3.8/site-packages/flask_login/utils.py", line 272, in decorated_view
+    return func(*args, **kwargs)
+  File "/home/adil/microblog/app/routes.py", line 78, in user
+    page = request.ars.get( 'page' , 1 , type = int)
+  File "/home/adil/microblog/venv/lib/python3.8/site-packages/werkzeug/local.py", line 347, in __getattr__
+    return getattr(self._get_current_object(), name)
+AttributeError: 'Request' object has no attribute 'ars'
+2020-04-14 23:19:49,424 INFO: Microblog startup [in /home/adil/microblog/app/__init__.py:47]
+2020-04-14 23:20:48,108 ERROR: Exception on /reset_password_request [POST] [in /home/adil/microblog/venv/lib/python3.8/site-packages/flask/app.py:1891]
+Traceback (most recent call last):
+  File "/home/adil/microblog/venv/lib/python3.8/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/adil/microblog/venv/lib/python3.8/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/adil/microblog/venv/lib/python3.8/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/adil/microblog/venv/lib/python3.8/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/adil/microblog/venv/lib/python3.8/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/adil/microblog/venv/lib/python3.8/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/adil/microblog/app/routes.py", line 169, in reset_password_request
+    send_password_reset_email(user)
+  File "/home/adil/microblog/app/email.py", line 9, in send_password_reset_email
+    sender=app.config['ADMINS'][0],
+NameError: name 'app' is not defined
+2020-04-14 23:21:13,451 INFO: Microblog startup [in /home/adil/microblog/app/__init__.py:47]
