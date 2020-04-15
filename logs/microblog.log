@@ -94,3 +94,4 @@ Traceback (most recent call last):
     {% elif not current_user.is_following(user) %}
 jinja2.exceptions.UndefinedError: 'flask_login.mixins.AnonymousUserMixin object' has no attribute 'is_following'
 2020-04-15 08:28:21,872 INFO: Microblog startup [in /home/adil/microblog/app/__init__.py:49]
+2020-04-15 08:44:22,939 INFO: Microblog startup [in /home/adil/microblog/app/__init__.py:51]
