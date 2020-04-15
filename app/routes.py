@@ -131,7 +131,6 @@ def unfollow(username):
     return redirect(url_for('user', username=username))
 
 @app.route('/explore')
-@login_required
 def explore():
     page = request.args.get( 'page' , 1 , type = int)
     posts = Post.query.order_by(Post.timestamp.desc()).paginate(
