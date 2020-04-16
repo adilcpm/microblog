@@ -12,13 +12,27 @@
                 {% if user.last_seen %}
                     <p>Last seen on: {{ moment(user.last_seen).format('LLL') }}</p>
                 {% endif %}
-                <p>{{ user.followers.count() }} followers, {{ user.followed.count() }} following.</p>
+                <p><a href="#" id="followers_btn">{{ user.followers.count() }}</a> followers, <a href="#" id="followed_btn">{{ user.followed.count() }}</span></a> following.</p>
+                {% if user.followers.count() %}
+                    <ul class="list-group hidden" id="followers_list">
+                    {% for my_follower in user.followers.all() %}
+                        <li class="list-group-item"><a href="{{ url_for('main.user', username=my_follower.username ) }}">{{ my_follower.username }}</a></li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if user.followed.count() %}
+                    <ul class="list-group hidden" id="followed_list">
+                    {% for my_followed in user.followed.all() %}
+                        <li class="list-group-item"><a href="{{ url_for('main.user', username=my_followed.username ) }}">{{ my_followed.username }}</a></li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
                 {% if user == current_user %}
-                <p><a href="{{ url_for('edit_profile') }}">Edit your profile</a></p>
+                <p><a href="{{ url_for('main.edit_profile') }}">Edit your profile</a></p>
                 {% elif not current_user.is_following(user) %}
-                <p><a href="{{ url_for('follow', username=user.username) }}">Follow</a></p>
+                <p><a href="{{ url_for('main.follow', username=user.username) }}">Follow</a></p>
                 {% else %}
-                <p><a href="{{ url_for('unfollow', username=user.username) }}">Unfollow</a></p>
+                <p><a href="{{ url_for('main.unfollow', username=user.username) }}">Unfollow</a></p>
                 {% endif %}
             </td>
         </tr>
