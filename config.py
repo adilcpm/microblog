@@ -1,4 +1,5 @@
 import os
+from ast import literal_eval
 from dotenv import load_dotenv
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -17,3 +18,5 @@ class Config(object):
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     ADMINS = ['adil@mcubeh.com','adil@mcubeh.in']
     ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL')
+    SQLALCHEMY_ENGINE_OPTIONS = literal_eval(os.environ.get('ENGINE_OPTIONS'))
+
