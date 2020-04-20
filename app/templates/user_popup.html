@@ -10,19 +10,18 @@
             <small>
                 {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
                 {% if user.last_seen %}
-                <p>{{ _('Last seen on') }}: 
+                <p>{{ 'Last seen on' }}: 
                    {{ moment(user.last_seen).format('lll') }}</p>
                 {% endif %}
-                <p>{{ _('%(count)d followers', count=user.followers.count()) }},
-                   {{ _('%(count)d following', count=user.followed.count()) }}</p>
+                <p>{{ user.followers.count() }} followers, {{ user.followed.count() }} following</p>
                 {% if user != current_user %}
                     {% if not current_user.is_following(user) %}
                     <a href="{{ url_for('main.follow', username=user.username) }}">
-                        {{ _('Follow') }}
+                        Follow
                     </a>
                     {% else %}
                     <a href="{{ url_for('main.unfollow', username=user.username) }}">
-                        {{ _('Unfollow') }}
+                        Unfollow
                     </a>
                     {% endif %}
                 {% endif %}
