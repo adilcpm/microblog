@@ -29,6 +29,28 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError('Please use a different email address.')
+    
+    def validate_password(self, passwd): 
+        
+        SpecialSym =['$', '@', '#', '%' , '!'] 
+        
+        if len(passwd.data) < 6: 
+            raise ValidationError('length should be at least 6') 
+            
+        if len(passwd.data) > 20: 
+            raise ValidationError('length should be not be greater than 20') 
+            
+        if not any(char.isdigit() for char in passwd.data): 
+            raise ValidationError('Password should have at least one numeral') 
+            
+        if not any(char.isupper() for char in passwd.data): 
+            raise ValidationError('Password should have at least one uppercase letter') 
+            
+        if not any(char.islower() for char in passwd.data): 
+            raise ValidationError('Password should have at least one lowercase letter') 
+            
+        if not any(char in SpecialSym for char in passwd.data): 
+            raise ValidationError('Password should have at least one of the symbols $,@,#,%,!') 
 
 
 class ResetPasswordRequestForm(FlaskForm):
