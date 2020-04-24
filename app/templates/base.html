@@ -39,8 +39,8 @@
                             Messages
                             {% set new_messages = current_user.new_messages() %}
                             <span id="message_count" class="badge"
-                                  style="visibility: {% if new_messages %}visible
-                                                     {% else %}hidden {% endif %};">
+                                  style="display: {% if new_messages %}inline-block
+                                                     {% else %}none {% endif %};">
                                 {{ new_messages }}
                             </span>
                         </a>
@@ -132,7 +132,7 @@
         });
         function set_message_count(n) {
             $('#message_count').text(n);
-            $('#message_count').css('visibility', n ? 'visible' : 'hidden');
+            $('#message_count').css('display', n ? 'inline-block' : 'none');
         }
         {% if current_user.is_authenticated %}
         $(function() {

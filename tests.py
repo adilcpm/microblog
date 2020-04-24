@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta
 import unittest
-from app import db
+from app import db, create_app
 from app.models import User, Post
 from config import Config
+
 
 
 class TestConfig(Config):
