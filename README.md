@@ -19,11 +19,11 @@ Progress : 90%
 
 1.Get Token: /api/tokens
 
-  GET {username}:{password}, to get new token
+  * GET {username}:{password}, to get new token
 
-  DELETE, to delete token 
+  * DELETE, to delete token 
 
-  Token must be passed as "Bearer {token}" for all subsequent requests except Creating New User endpoint
+  >Token must be passed as "Bearer {token}" for all subsequent requests except Creating New User endpoint
 
 2.Endpoints
    
