@@ -26,7 +26,8 @@ Progress : 90%
   >Token must be passed as "Bearer {token}" for all subsequent requests except Creating New User endpoint
 
 2.Endpoints
-   
+  
+  **Users**
   1. GET /api/users/{id}
   >get details of User with ID={id}
   2. GET /api/users
@@ -35,7 +36,17 @@ Progress : 90%
   >return followers of User with ID={id}
   4. GET /api/users/{id}/followed
   >return users following the User with ID={id>}
-  5. POST /api/users
+  5. GET /api/users/{id}/posts
+  >return posts of the user with ID={id}
+  6. POST /api/users
   >Register a new account, which returns the User Details on succesfull transaction
-  6. PUT /api/users/{id}
+  7. PUT /api/users/{id}
   >modify Username, Email, About Me of User, by passing it as JSON data
+ 
+  **Posts**
+  1.GET /api/posts
+  >get all posts sorted by timestamp descending
+  2.GET /api/posts/{id}
+  >get post with id={id}
+  3.POST /api/posts
+  >Create new post with passing {"body" : "data"} JSON format
