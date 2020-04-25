@@ -184,6 +184,7 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
                 'self': url_for('api.get_user', id=self.id),
                 'followers': url_for('api.get_followers', id=self.id),
                 'followed': url_for('api.get_followed', id=self.id),
+                'posts' : url_for('api.get_user_posts', id=self.id),
                 'avatar': self.avatar(128)
             }
         }
@@ -223,7 +224,7 @@ def load_user(id):
     return User.query.get(int(id))
 
 
-class Post(SearchableMixin, db.Model):
+class Post(PaginatedAPIMixin, SearchableMixin, db.Model):
     __searchable__ = ['body']
     id = db.Column(db.Integer, primary_key=True)
     body = db.Column(db.String(140))
@@ -232,6 +233,20 @@ class Post(SearchableMixin, db.Model):
 
     def __repr__(self):
         return '<Post {}>'.format(self.body)
+
+    def to_dict(self):
+        data = {
+            'id': self.id,
+            'author': self.author.username,
+            'body' : self.body,
+            'timestamp' : self.timestamp,
+            '_links': {
+                'self': url_for('api.get_post', id=self.id),
+                'user' : url_for('api.get_user', id=self.author.id),
+                'avatar': self.author.avatar(128)
+            }
+        }
+        return data
 
 
 class Message(db.Model):

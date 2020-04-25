@@ -4,7 +4,7 @@ from app import db
 from app.api import bp
 from app.api.auth import token_auth
 from app.api.errors import bad_request
-from app.models import User
+from app.models import User, Post
 
 
 @bp.route('/users/<int:id>', methods=['GET'])
@@ -42,6 +42,16 @@ def get_followed(id):
     data = User.to_collection_dict(
         user.followed, page, per_page, 'api.get_followed', id=id)
     return jsonify(data)
+
+@bp.route('/users/<int:id>/posts', methods=['GET'])
+@token_auth.login_required
+def get_user_posts(id):
+    user = User.query.get_or_404(id)
+    page = request.args.get('page', 1, type=int)
+    per_page = min(request.args.get('per_page', 10, type=int), 100)
+    posts = Post.to_collection_dict(
+        user.posts.order_by(Post.timestamp.desc()), page, per_page, 'api.get_user_posts', id=id)
+    return jsonify(posts)
 
 
 @bp.route('/users', methods=['POST'])
