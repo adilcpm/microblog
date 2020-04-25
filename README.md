@@ -28,6 +28,7 @@ Progress : 90%
 2.Endpoints
   
   **Users**
+  
   1. GET /api/users/{id}
   >get details of User with ID={id}
   2. GET /api/users
@@ -44,9 +45,12 @@ Progress : 90%
   >modify Username, Email, About Me of User, by passing it as JSON data
  
   **Posts**
+  
   1.GET /api/posts
   >get all posts sorted by timestamp descending
+  
   2.GET /api/posts/{id}
   >get post with id={id}
+  
   3.POST /api/posts
   >Create new post with passing {"body" : "data"} JSON format
