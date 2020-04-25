@@ -16,7 +16,7 @@ class Config(object):
     MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') is not None
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
-    ADMINS = ['adil@mcubeh.com','adil@mcubeh.in']
+    ADMINS = ['adil@mcubeh.com']
     ELASTICSEARCH_URL = os.environ.get('ELASTICSEARCH_URL')
     SQLALCHEMY_ENGINE_OPTIONS = literal_eval(os.environ.get('ENGINE_OPTIONS'))
 
