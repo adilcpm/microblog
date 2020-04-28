@@ -1,0 +1,10 @@
+<li class="clearfix">
+    <div class="message-data align-right">
+        <span class="message-data-time" >{{ moment(msg.timestamp).calendar() }}</span> &nbsp; &nbsp;
+        <span class="message-data-name" >{{ msg.author.username }}</span> <i class="fa fa-circle me"></i>
+        
+    </div>
+    <div class="message other-message float-right">
+        {{ msg.body }}
+    </div>
+</li>

@@ -55,11 +55,6 @@
 {% endblock %}
 
 {% block content %}
-    <style>
-    .show {
-        display:block !important;
-    }
-    </style>
     <div class="container">
         {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -77,17 +72,18 @@
 {% block scripts %}
     {{ super() }}
     {{ moment.include_moment() }}
+    {{ moment.locale('en', {
+            calendar : {
+                lastDay : 'h:mmA [, Yesterday]',
+                sameDay : 'h:mmA [, Today]',
+                nextDay : '[Tomorrow at] LT',
+                lastWeek : 'h:mmA [, last] dddd',
+                nextWeek : 'dddd [at] LT',
+                sameElse : 'h:mmA , L'
+            }
+        })
+    }}
     <script>
-    $(document).ready(function() {
-        $("#followers_btn").click(function(){
-            $("#followers_list").addClass("show");
-            $("#followed_list").removeClass("show");
-        });
-        $("#followed_btn").click(function(){
-            $("#followed_list").addClass("show");
-            $("#followers_list").removeClass("show");
-        });
-    });
     $(function () {
             var timer = null;
             var xhr = null;

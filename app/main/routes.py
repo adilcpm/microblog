@@ -1,13 +1,14 @@
 from datetime import datetime
 
-from flask import (current_app, flash, g, redirect, render_template, request,
-                   url_for, jsonify)
+from flask import (current_app, flash, g, jsonify, redirect, render_template,
+                   request, url_for, session)
 from flask_login import current_user, login_required
-
-from app import db
+from flask_socketio import join_room
+from app import db, socketio
 from app.main import bp
-from app.main.forms import EditProfileForm, PostForm, SearchForm, MessageForm
-from app.models import Post, User, Message, Notification
+from app.main.forms import EditProfileForm, MessageForm, PostForm, SearchForm
+from app.models import Message, Notification, Post, User
+import json
 
 
 @bp.before_request
@@ -170,7 +171,7 @@ def messages():
     prev_url = url_for('main.messages', page=messages.prev_num) \
         if messages.has_prev else None
     return render_template('messages.html', messages=messages.items,
-                           next_url=next_url, prev_url=prev_url)
+                           title='My Messages', next_url=next_url, prev_url=prev_url)
 
 
 @bp.route('/notifications')
@@ -184,3 +185,46 @@ def notifications():
         'data': n.get_data(),
         'timestamp': n.timestamp
     } for n in notifications])
+
+@bp.route('/chat/<recipient>')
+@login_required
+def chat(recipient):
+    session['chatuser'] = recipient
+    user = User.query.filter_by(username=recipient).first_or_404()
+    my_messages = Message.query.filter_by(author=current_user,recipient=user)
+    other_messages = Message.query.filter_by(author=user,recipient=current_user)
+    all_messages = my_messages.union(other_messages).order_by(Message.timestamp.asc())
+    return render_template('chat.html', user=user,title="Chat with " + recipient, messages=all_messages)
+
+@socketio.on('send message')
+def handleMessage(msg):
+    recipient = User.query.filter_by(username=session['chatuser']).first()
+    msg = Message(author=current_user, recipient=recipient,
+                      body=msg)
+    db.session.add(msg)
+    recipient.add_notification('unread_message_count', recipient.new_messages())
+    db.session.commit()
+    json_msg = {
+        'body' : msg.body,
+        'author' : current_user.username,
+        'recipient' : session['chatuser']
+    }
+    socketio.emit('recieve message',json_msg, room=session['chatuser'] + 'and' + current_user.username)
+
+@socketio.on('connect')
+def handleConnect():
+    join_room(current_user.username + 'and' + session['chatuser'])
+    join_room(session['chatuser'] + 'and' + current_user.username)
+    current_user.online = True
+    db.session.commit()
+    socketio.emit('online', current_user.username)
+
+@socketio.on('disconnect')
+def handleDisconnect():
+    current_user.online = False
+    db.session.commit()
+    socketio.emit('offline', current_user.username)
+
+@socketio.on('typing')
+def typing(user):
+    socketio.emit('typed',user,room=session['chatuser'] + 'and' + current_user.username)

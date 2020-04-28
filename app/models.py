@@ -112,6 +112,7 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
                                     lazy='dynamic')
     token = db.Column(db.String(32), index=True, unique=True)
     token_expiration = db.Column(db.DateTime)
+    online = db.Column(db.Boolean, default=False)
 
     def add_notification(self, name, data):
         self.notifications.filter_by(name=name).delete()

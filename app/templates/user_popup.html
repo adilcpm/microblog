@@ -24,6 +24,11 @@
                         Unfollow
                     </a>
                     {% endif %}
+                <br>
+                <a href="{{ url_for('main.chat',
+                                        recipient=user.username) }}">
+                        Chat
+                </a>
                 {% endif %}
             </small>
         </td>

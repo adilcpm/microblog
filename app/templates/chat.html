@@ -1,0 +1,54 @@
+{% extends "base.html" %}  
+
+{% block app_content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='chat.css') }}">
+    <input id="chatuser" type="text" value="{{ user.username }}" style="display:none;">
+    <input id="currentuser" type="text" value="{{ current_user.username }}" style="display:none;">
+
+    <div class="chat-container clearfix">
+
+        <div class="chat">
+            <div class="chat-header chat-clearfix">
+                <img id="chat-avatar" src="{{ user.avatar(55) }}" alt="avatar" style="border-color:{% if user.online %} #86BB71 {% endif %}"/>
+                <div class="chat-about">
+                <div class="chat-with">Chat with {{ user.username }}</div>
+                <div class="chat-num-messages">already {{ messages.count() }} messages</div>
+                </div>
+            </div> <!-- end chat-header -->
+            
+            <div class="chat-history" id="chat-history">
+                <ul id="messages">
+                {% for msg in messages %}
+                    {% if msg.author == user %}
+                        {% include '_othermsg.html' %}
+                    {% else %}
+                        {% include '_mymsg.html' %}
+                    {% endif %}
+                {% endfor %}
+                <li id='typing'>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </li>
+                </ul>
+                
+            </div> <!-- end chat-history -->
+            
+            <div class="chat-message clearfix">
+                <textarea name="message-to-send" id="myMessage" placeholder ="Type your message" rows="3"></textarea>
+                <button id="sendbutton">Send</button>
+
+            </div> <!-- end chat-message -->
+            
+        </div> <!-- end chat -->
+        
+    </div> <!-- end container -->
+
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='chat.js') }}"></script>
+{% endblock %}
