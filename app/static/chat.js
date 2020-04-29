@@ -42,7 +42,7 @@ $(document).ready(function() {
                 </div>
             </li>`;
         }
-        $("#messages li:last-child").after(msg_html);
+        $("ul#messages li:nth-last-child(2)").after(msg_html);
         updateScroll();
     });
 
