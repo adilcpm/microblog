@@ -8,6 +8,7 @@ ul#messages{
   bottom: 0;
   height: 100%;
   max-width: 490px;
+  width: 100%;
 }
 .chat-container {
   margin: 0 auto;
