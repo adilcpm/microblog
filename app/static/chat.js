@@ -23,7 +23,7 @@ $(document).ready(function() {
             <li class="clearfix">
                 <div class="message-data align-right">
                     <span class="message-data-time" >${ moment().calendar() }</span> &nbsp; &nbsp;
-                    <span class="message-data-name" >${ json_msg.author }</span> <i class="fa fa-circle me"></i>
+                    <span class="message-data-name" >${ json_msg.author }</span> <span class="mydot me"></span>
                 </div>
                 <div class="message other-message float-right">
                     ${json_msg.body}
@@ -34,7 +34,7 @@ $(document).ready(function() {
             msg_html = `
             <li>
                 <div class="message-data">
-                    <span class="message-data-name"><i class="fa fa-circle online"></i> ${ json_msg.author }</span>
+                    <span class="message-data-name"><span class="mydot online"></span> ${ json_msg.author }</span>
                     <span class="message-data-time">${ moment().calendar()}</span>
                 </div>
                 <div class="message my-message">
