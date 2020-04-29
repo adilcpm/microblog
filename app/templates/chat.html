@@ -15,8 +15,9 @@
                 <div class="chat-num-messages">already {{ messages.count() }} messages</div>
                 </div>
             </div> <!-- end chat-header -->
-            
+            <div id="fader"></div>
             <div class="chat-history" id="chat-history">
+                
                 <ul id="messages">
                 {% for msg in messages %}
                     {% if msg.author == user %}
@@ -25,12 +26,13 @@
                         {% include '_mymsg.html' %}
                     {% endif %}
                 {% endfor %}
-                <li id='typing'>
-                    <span class="dot"></span>
-                    <span class="dot"></span>
-                    <span class="dot"></span>
-                </li>
+                
                 </ul>
+                <div id='typing'>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
                 
             </div> <!-- end chat-history -->
             

@@ -7,7 +7,7 @@ $(document).ready(function() {
     const CHATUSER = $('#chatuser').val();
     const CURRENTUSER = $('#currentuser').val();
     var canPublish = true;
-    var throttleTime = 500;
+    var throttleTime = 300;
     var clearInterval = 900;
     clearTimerId = setTimeout(function () {
         //clear user is typing message
@@ -44,18 +44,19 @@ $(document).ready(function() {
         }
         $("#messages").append(msg_html);
         updateScroll();
-        console.log('Received message');
     });
 
     $('#sendbutton').on('click', function() {
         socket.emit('send message', $('#myMessage').val() );
         $('#myMessage').val('');
     });
-    $('.chat-message').keyup(function() {
+    $('.chat-message').keyup(function(e) {
         // Triggering Typing Animation
-        console.log('Inside keyup');
+        if(e.keyCode == 13){
+            socket.emit('send message', $('#myMessage').val() );
+            $('#myMessage').val('');
+        };
         if(canPublish) {
-            console.log('Emitting Typing !');
             socket.emit('typing', CURRENTUSER );
             canPublish = false;
             setTimeout(function() {
@@ -66,7 +67,6 @@ $(document).ready(function() {
     socket.on('typed', function(user){
         if(user != CURRENTUSER ){ 
             $('#typing').show() ;
-            console.log('Triggered Typing')
             clearTimeout(clearTimerId);
             clearTimerId = setTimeout(function () {
                 //clear user is typing message
@@ -75,9 +75,7 @@ $(document).ready(function() {
         };
     });
     socket.on('online', function(user){
-        console.log('Online : ' + user)
         if(user == CHATUSER){
-            console.log('online setted !')
             $('#chat-avatar').attr("style","border-color: #86BB71;")
         }
     });
