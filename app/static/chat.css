@@ -98,6 +98,7 @@ ul#messages{
   border-radius: 7px;
   margin-bottom: 10px;
   min-width: 90%;
+  width: 90%;
   position: relative;
 }
 .chat .chat-history .message:after {
