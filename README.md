@@ -19,7 +19,7 @@ Progress : 90%
 
 1.Get Token: /api/tokens
 
-  * GET {username}:{password}, to get new token
+  * POST {username}:{password}, to get new token
 
   * DELETE, to delete token 
 
