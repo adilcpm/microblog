@@ -14,14 +14,16 @@
                         </a>
                     </span>
                 {% endset %}
-                {{ current_user.unread_msgs(chat.id) }} Unread Messages
+                <h4>Chat with {{ user_link }}</h4>
+                <span id="chat_count" class="badge"
+                    style="display: {% if current_user.unread_msgs(chat.id) %}inline-block
+                                {% else %}none {% endif %};">
+                    {{ current_user.unread_msgs(chat.id) }}
+                </span>
+                {{ chat.last_msg().author.username }} said {{ moment(chat.last_msg().timestamp).fromNow() }}: {{ chat.last_msg().body }}
                 <br>
-                {{ user_link }} said {{ moment(chat.last_msg().timestamp).fromNow() }}:
-                <br>
-                {{ chat.last_msg().body }}
-                <br><br>
-                <a href="{{ url_for('main.chat', recipient=chat_user.username) }}" class="btn btn-primary btn-xs">
-                Chat</a>
+                <a href="{{ url_for('main.chat', recipient=chat_user.username) }}" class="btn btn-primary btn-xs chat-btn">
+                Chat Now</a>
             </td>
         </tr>
     </table>

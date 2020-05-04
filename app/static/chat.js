@@ -9,12 +9,30 @@ $(document).ready(function() {
     var canPublish = true;
     var throttleTime = 300;
     var clearInterval = 900;
+    var socket = io();
     clearTimerId = setTimeout(function () {
         //clear user is typing message
         $('#typing').hide();
         }, clearInterval);
 
-    var socket = io();
+    $('#sendbutton').on('click', function() {
+        if($('#myMessage').val().trim() == ''){ return } //Check if field is empty, then do nothing
+        socket.emit('send message', $('#myMessage').val() );
+        $('#myMessage').val('');
+    });
+    $('.chat-message').keyup(function(e) {
+        // Triggering Typing Animation
+        if(e.keyCode == 13){
+            $('#sendbutton').trigger('click'); //If key pressed is Enter, trigger click function
+        };
+        if(canPublish) {
+            socket.emit('typing', CURRENT_USER );
+            canPublish = false;
+            setTimeout(function() {
+              canPublish = true;
+            }, throttleTime);
+        }
+    });
     socket.on('recieve message', function(json_msg) {
         let msg_html = ''
         if(json_msg.author == CURRENT_USER){
@@ -45,25 +63,6 @@ $(document).ready(function() {
         }
         $("ul#messages li:nth-last-child(2)").after(msg_html);
         updateScroll();
-    });
-
-    $('#sendbutton').on('click', function() {
-        if($('#myMessage').val().trim() == ''){ return } //Check if field is empty, then do nothing
-        socket.emit('send message', $('#myMessage').val() );
-        $('#myMessage').val('');
-    });
-    $('.chat-message').keyup(function(e) {
-        // Triggering Typing Animation
-        if(e.keyCode == 13){
-            $('#sendbutton').trigger('click'); //If key pressed is Enter, trigger click function
-        };
-        if(canPublish) {
-            socket.emit('typing', CURRENT_USER );
-            canPublish = false;
-            setTimeout(function() {
-              canPublish = true;
-            }, throttleTime);
-        }
     });
     socket.on('typed', function(user){
         if(user != CURRENT_USER ){ 
