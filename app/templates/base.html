@@ -35,13 +35,13 @@
                     <li><a href="{{ url_for('auth.login') }}">Login</a></li>
                     {% else %}
                     <li>
-                        <a href="{{ url_for('main.messages') }}">
-                            Messages
-                            {% set new_messages = current_user.new_messages() %}
-                            <span id="message_count" class="badge"
-                                  style="display: {% if new_messages %}inline-block
+                        <a href="{{ url_for('main.chats') }}">
+                            Chats
+                            {% set new_chats = current_user.unread_chats() %}
+                            <span id="chat_count" class="badge"
+                                  style="display: {% if new_chats %}inline-block
                                                      {% else %}none {% endif %};">
-                                {{ new_messages }}
+                                {{ new_chats }}
                             </span>
                         </a>
                     </li>
@@ -126,9 +126,9 @@
                 }
             );
         });
-        function set_message_count(n) {
-            $('#message_count').text(n);
-            $('#message_count').css('display', n ? 'inline-block' : 'none');
+        function set_chat_count(n) {
+            $('#chat_count').text(n);
+            $('#chat_count').css('display', n ? 'inline-block' : 'none');
         }
         {% if current_user.is_authenticated %}
         $(function() {
@@ -137,8 +137,8 @@
                 $.ajax('{{ url_for('main.notifications') }}?since=' + since).done(
                     function(notifications) {
                         for (var i = 0; i < notifications.length; i++) {
-                            if (notifications[i].name == 'unread_message_count')
-                                set_message_count(notifications[i].data);
+                            if (notifications[i].name == 'unread_chats')
+                                set_chat_count(notifications[i].data);
                             since = notifications[i].timestamp;
                         }
                     }

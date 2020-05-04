@@ -1,0 +1,27 @@
+{% set chat_user = chat.other(current_user.id) %}
+<table class="table table-hover" {% if current_user.unread_msgs(chat.id) %}style="background-color:#187fff1c"{% endif %}>
+        <tr>
+            <td width="70px">
+                <a href="{{ url_for('main.user', username=chat_user.username) }}">
+                    <img src="{{ chat_user.avatar(70) }}" />
+                </a>
+            </td>
+            <td>
+                {% set user_link %}
+                    <span class="user_popup">
+                        <a href="{{ url_for('main.user', username=chat_user.username) }}">
+                            {{ chat_user.username }}
+                        </a>
+                    </span>
+                {% endset %}
+                {{ current_user.unread_msgs(chat.id) }} Unread Messages
+                <br>
+                {{ user_link }} said {{ moment(chat.last_msg().timestamp).fromNow() }}:
+                <br>
+                {{ chat.last_msg().body }}
+                <br><br>
+                <a href="{{ url_for('main.chat', recipient=chat_user.username) }}" class="btn btn-primary btn-xs">
+                Chat</a>
+            </td>
+        </tr>
+    </table>

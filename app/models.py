@@ -8,6 +8,7 @@ from time import time
 import jwt
 from flask import current_app, url_for
 from flask_login import UserMixin
+from sqlalchemy import or_
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import db, login
@@ -101,18 +102,26 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
         primaryjoin=(followers.c.follower_id == id),
         secondaryjoin=(followers.c.followed_id == id),
         backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
-    messages_sent = db.relationship('Message',
-                                    foreign_keys='Message.sender_id',
+    messages_sent = db.relationship('Messages',
+                                    foreign_keys='Messages.sender_id',
                                     backref='author', lazy='dynamic')
-    messages_received = db.relationship('Message',
-                                        foreign_keys='Message.recipient_id',
+    messages_received = db.relationship('Messages',
+                                        foreign_keys='Messages.reciever_id',
                                         backref='recipient', lazy='dynamic')
-    last_message_read_time = db.Column(db.DateTime)
     notifications = db.relationship('Notification', backref='user',
                                     lazy='dynamic')
     token = db.Column(db.String(32), index=True, unique=True)
     token_expiration = db.Column(db.DateTime)
     online = db.Column(db.Boolean, default=False)
+
+    def mychats(self):
+        return Chats.query.filter(or_(Chats.user1 == self.id, Chats.user2 == self.id))
+
+    def unread_chats(self):
+        return self.messages_received.filter_by(reciever_read=False).group_by(Messages.chat_id).count()
+
+    def unread_msgs(self,chat_id):
+        return self.messages_received.filter_by(reciever_read=False,chat_id=chat_id).count()
 
     def add_notification(self, name, data):
         self.notifications.filter_by(name=name).delete()
@@ -120,10 +129,6 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
         db.session.add(n)
         return n
 
-    def new_messages(self):
-        last_read_time = self.last_message_read_time or datetime(1900, 1, 1)
-        return Message.query.filter_by(recipient=self).filter(
-            Message.timestamp > last_read_time).count()
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -250,15 +255,35 @@ class Post(PaginatedAPIMixin, SearchableMixin, db.Model):
         return data
 
 
-class Message(db.Model):
+class Chats(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    recipient_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    body = db.Column(db.String(140))
-    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    user1 = db.Column(db.Integer, index=True)
+    user2 = db.Column(db.Integer, index=True)
+    msgs = db.relationship('Messages', foreign_keys='Messages.chat_id',backref='chat_session', lazy='dynamic')
+    
+    def last_msg(self):
+        return Messages.query.filter_by(chat_id=self.id).order_by(Messages.timestamp.desc()).first()
+
+    def other(self,this_user_id):
+        if this_user_id == self.user1:
+            return User.query.get(self.user2)
+        elif this_user_id == self.user2:
+            return User.query.get(self.user1)
 
     def __repr__(self):
-        return '<Message {}>'.format(self.body)
+        return '<Chat between {} and {}>'.format(self.user1,self.user2)
+
+class Messages(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    reciever_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    reciever_read = db.Column(db.Boolean, default=False)
+    body = db.Column(db.String(140))
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    chat_id = db.Column(db.Integer, db.ForeignKey('chats.id'))
+
+    def __repr__(self):
+        return '<Messages {}>'.format(self.body)
 
 
 class Notification(db.Model):

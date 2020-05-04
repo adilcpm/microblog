@@ -4,8 +4,8 @@ $(document).ready(function() {
         element.scrollTop = element.scrollHeight;
     };
     updateScroll();
-    const CHATUSER = $('#chatuser').val();
-    const CURRENTUSER = $('#currentuser').val();
+    const CHAT_USER = $('#chatuser').val()
+    const CURRENT_USER = $('#currentuser').val();
     var canPublish = true;
     var throttleTime = 300;
     var clearInterval = 900;
@@ -17,7 +17,7 @@ $(document).ready(function() {
     var socket = io();
     socket.on('recieve message', function(json_msg) {
         let msg_html = ''
-        if(json_msg.recipient == CHATUSER){
+        if(json_msg.author == CURRENT_USER){
             // Check whether this is my message or other user's msg
             msg_html = `
             <li class="clearfix">
@@ -41,23 +41,24 @@ $(document).ready(function() {
                     ${ json_msg.body }
                 </div>
             </li>`;
+            socket.emit('read msg');
         }
         $("ul#messages li:nth-last-child(2)").after(msg_html);
         updateScroll();
     });
 
     $('#sendbutton').on('click', function() {
+        if($('#myMessage').val().trim() == ''){ return } //Check if field is empty, then do nothing
         socket.emit('send message', $('#myMessage').val() );
         $('#myMessage').val('');
     });
     $('.chat-message').keyup(function(e) {
         // Triggering Typing Animation
         if(e.keyCode == 13){
-            socket.emit('send message', $('#myMessage').val() );
-            $('#myMessage').val('');
+            $('#sendbutton').trigger('click'); //If key pressed is Enter, trigger click function
         };
         if(canPublish) {
-            socket.emit('typing', CURRENTUSER );
+            socket.emit('typing', CURRENT_USER );
             canPublish = false;
             setTimeout(function() {
               canPublish = true;
@@ -65,7 +66,7 @@ $(document).ready(function() {
         }
     });
     socket.on('typed', function(user){
-        if(user != CURRENTUSER ){ 
+        if(user != CURRENT_USER ){ 
             $('#typing').show() ;
             clearTimeout(clearTimerId);
             clearTimerId = setTimeout(function () {
@@ -75,14 +76,18 @@ $(document).ready(function() {
         };
     });
     socket.on('online', function(user){
-        if(user == CHATUSER){
-            $('#chat-avatar').attr("style","border-color: #86BB71;")
+        if(user == CHAT_USER){
+            $('#chat-avatar').attr("style","border-color: #86BB71;") 
         }
     });
     socket.on('offline', function(user){
         console.log('')
-        if(user == CHATUSER){
+        if(user == CHAT_USER){
             $("#chat-avatar").attr("style","border-color: transparent;")
         }
-    })
+    });
+    socket.on('refresh', function(){ 
+        //Reload the Page, true is not force from server
+        location.reload(true);
+    });
 });

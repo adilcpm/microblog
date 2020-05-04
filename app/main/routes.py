@@ -1,14 +1,16 @@
+import json
 from datetime import datetime
 
 from flask import (current_app, flash, g, jsonify, redirect, render_template,
-                   request, url_for, session)
+                   request, session, url_for)
 from flask_login import current_user, login_required
 from flask_socketio import join_room
+from sqlalchemy import or_
+
 from app import db, socketio
 from app.main import bp
 from app.main.forms import EditProfileForm, MessageForm, PostForm, SearchForm
-from app.models import Message, Notification, Post, User
-import json
+from app.models import Chats, Messages, Notification, Post, User
 
 
 @bp.before_request
@@ -140,40 +142,6 @@ def user_popup(username):
     return render_template('user_popup.html', user=user)
 
 
-@bp.route('/send_message/<recipient>', methods=['GET', 'POST'])
-@login_required
-def send_message(recipient):
-    user = User.query.filter_by(username=recipient).first_or_404()
-    form = MessageForm()
-    if form.validate_on_submit():
-        msg = Message(author=current_user, recipient=user,
-                      body=form.message.data)
-        db.session.add(msg)
-        user.add_notification('unread_message_count', user.new_messages())
-        db.session.commit()
-        flash('Your message has been sent.')
-        return redirect(url_for('main.user', username=recipient))
-    return render_template('send_message.html', title='Send Message', form=form, recipient=recipient)
-
-
-@bp.route('/messages')
-@login_required
-def messages():
-    current_user.last_message_read_time = datetime.utcnow()
-    current_user.add_notification('unread_message_count', 0)
-    db.session.commit()
-    page = request.args.get('page', 1, type=int)
-    messages = current_user.messages_received.order_by(
-        Message.timestamp.desc()).paginate(
-            page, current_app.config['POSTS_PER_PAGE'], False)
-    next_url = url_for('main.messages', page=messages.next_num) \
-        if messages.has_next else None
-    prev_url = url_for('main.messages', page=messages.prev_num) \
-        if messages.has_prev else None
-    return render_template('messages.html', messages=messages.items,
-                           title='My Messages', next_url=next_url, prev_url=prev_url)
-
-
 @bp.route('/notifications')
 @login_required
 def notifications():
@@ -186,35 +154,60 @@ def notifications():
         'timestamp': n.timestamp
     } for n in notifications])
 
+@bp.route('/chats')
+def chats():
+    page = request.args.get('page', 1, type=int)
+    chats = current_user.mychats().all()
+    chats.sort(reverse=True, key=lambda x:x.last_msg().timestamp) # Sort with timestamp of last msg of each chat
+    return render_template('chats.html', chats=chats, title='My Chats')
+
 @bp.route('/chat/<recipient>')
 @login_required
 def chat(recipient):
-    session['chatuser'] = recipient
-    user = User.query.filter_by(username=recipient).first_or_404()
-    my_messages = Message.query.filter_by(author=current_user,recipient=user)
-    other_messages = Message.query.filter_by(author=user,recipient=current_user)
-    all_messages = my_messages.union(other_messages).order_by(Message.timestamp.asc())
-    return render_template('chat.html', user=user,title="Chat with " + recipient, messages=all_messages)
+    chat_user = User.query.filter_by(username=recipient).first_or_404()
+    this_chat = current_user.mychats().filter(or_(Chats.user1 == chat_user.id,Chats.user2 == chat_user.id)).first() #Get chat if exists
+    if(this_chat): # Check if chat exists, if not make session None
+        session['chat_session'] = [this_chat.id,chat_user.id]
+        messages = this_chat.msgs.order_by(Messages.timestamp.asc())
+        for msg in this_chat.msgs.order_by(Messages.timestamp.desc()).limit(current_user.unread_msgs(this_chat.id)): #Get all the unread msgs and change its flag
+            if(msg.author != current_user):
+                msg.reciever_read = True
+        current_user.add_notification('unread_chats',current_user.unread_chats())
+        db.session.commit()
+        return render_template('chat.html', chat_user=chat_user,title="Chat with " + recipient, messages=messages)
+    else:
+        session['chat_session'] = ['None',chat_user.id]
+        return render_template('chat.html', chat_user=chat_user,title="Chat with " + recipient, messages='None')
 
 @socketio.on('send message')
 def handleMessage(msg):
-    recipient = User.query.filter_by(username=session['chatuser']).first()
-    msg = Message(author=current_user, recipient=recipient,
-                      body=msg)
+    temp_chat = session['chat_session'][0] #Hold value of session at this stage, for use down below
+    if(temp_chat == 'None'):
+        # no chat is allocated, so create a new chat
+        this_chat = Chats(user1=current_user.id,user2=session['chat_session'][1])
+        session['chat_session'][0] == this_chat.id
+        db.session.add(this_chat)
+    else: 
+        # if chat was already there, load the chat
+        this_chat = Chats.query.get(session['chat_session'][0])
+    msg = Messages(author=current_user, recipient=this_chat.other(current_user.id),
+                      body=msg,chat_session=this_chat)
+    reciever = User.query.get(session['chat_session'][1])
+    reciever.add_notification('unread_chats',reciever.unread_chats())
     db.session.add(msg)
-    recipient.add_notification('unread_message_count', recipient.new_messages())
     db.session.commit()
+    if(temp_chat == 'None'): #if first message, refresh the page to load chat session properly
+        socketio.emit('refresh')
     json_msg = {
         'body' : msg.body,
-        'author' : current_user.username,
-        'recipient' : session['chatuser']
+        'author' : current_user.username
     }
-    socketio.emit('recieve message',json_msg, room=session['chatuser'] + 'and' + current_user.username)
+    socketio.emit('recieve message',json_msg, room=session['chat_session'][0])
+
 
 @socketio.on('connect')
 def handleConnect():
-    join_room(current_user.username + 'and' + session['chatuser'])
-    join_room(session['chatuser'] + 'and' + current_user.username)
+    join_room(session['chat_session'][0])
     current_user.online = True
     db.session.commit()
     socketio.emit('online', current_user.username)
@@ -227,4 +220,11 @@ def handleDisconnect():
 
 @socketio.on('typing')
 def typing(user):
-    socketio.emit('typed',user,room=session['chatuser'] + 'and' + current_user.username)
+    socketio.emit('typed',user,room=session['chat_session'][0])
+
+@socketio.on('read msg')
+def readmsg():
+    Chats.query.get(session['chat_session'][0]).last_msg().reciever_read = True
+    current_user.add_notification('unread_chats',current_user.unread_chats())
+    db.session.commit()
+
