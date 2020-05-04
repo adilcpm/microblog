@@ -9,7 +9,7 @@ Progress : 90%
 
 2.User Following System
 
-3.User Private Messages
+3.Real Time Chat between Users
 
 4.Full Text Search using Elastic Search
 
