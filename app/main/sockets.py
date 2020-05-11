@@ -27,7 +27,7 @@ def handleMessage(msg):
         'body' : msg.body,
         'author' : current_user.username
     }
-    socketio.emit('recieve message',json_msg, room=session['chat_session'][0])
+    socketio.emit('receive message',json_msg, room=session['chat_session'][0])
 
 
 @socketio.on('connect')
