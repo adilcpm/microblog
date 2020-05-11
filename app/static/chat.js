@@ -33,7 +33,7 @@ $(document).ready(function() {
             }, throttleTime);
         }
     });
-    socket.on('recieve message', function(json_msg) {
+    socket.on('receive message', function(json_msg) {
         let msg_html = ''
         if(json_msg.author == CURRENT_USER){
             // Check whether this is my message or other user's msg
